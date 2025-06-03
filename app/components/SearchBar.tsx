@@ -1,4 +1,31 @@
-export default function SearchBar({ placeholder = "Search" }: { placeholder?: string }) {
+"use client";
+
+import { useState, ChangeEvent } from 'react';
+
+interface SearchBarProps {
+  placeholder?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export default function SearchBar({ 
+  placeholder = "Search",
+  value: controlledValue,
+  onChange: onControlledChange 
+}: SearchBarProps) {
+  const [internalValue, setInternalValue] = useState("");
+  
+  const isControlled = controlledValue !== undefined;
+  const currentValue = isControlled ? controlledValue : internalValue;
+  
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
+    onControlledChange?.(newValue);
+  };
+
   return (
     <label className="flex flex-col min-w-40 h-full">
       <div className="flex w-full flex-1 items-stretch rounded-lg h-full">
@@ -14,7 +41,8 @@ export default function SearchBar({ placeholder = "Search" }: { placeholder?: st
         <input
           placeholder={placeholder}
           className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d141c] focus:outline-0 focus:ring-0 border-none bg-[#e7edf4] focus:border-none h-full placeholder:text-[#49739c] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
-          value=""
+          value={currentValue}
+          onChange={handleChange}
         />
       </div>
     </label>
